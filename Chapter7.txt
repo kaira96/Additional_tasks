@@ -1,0 +1,11 @@
+Chapter 7
+1Build HackerNews clone: https://news.ycombinator.com﻿
+1.1Login/Signup
+1.2Add Post with link
+1.3Add comments under Post
+1.4Add Like under Post. Only authorized User can like
+1.5Add pagination
+1.6Add search by title of Post
+2Castle on the grid: https://www.hackerrank.com/challenges/castle-on-the-grid/problem﻿
+3Sherlock and the Valid String: https://www.hackerrank.com/challenges/sherlock-and-valid-string/problem﻿
+﻿

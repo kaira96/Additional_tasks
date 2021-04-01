@@ -1,0 +1,28 @@
+Chapter 6
+Django girls: https://tutorial.djangogirls.org/ru/﻿
+Molchanov: https://www.youtube.com/watch?v=T0Xi8gWDrQ0&list=PLlWXhlUMyooaDkd39pknA1-Olj54HtpjX﻿
+Todo list:
+Create - Read - Update - Delete
+Use Jinja templates
+Use Mysql
+Use migrations
+﻿
+
+Example of Main Page
+Example of Main Page
+
+﻿
+
+﻿
+
+Example of sign up page
+Example of sign up page
+
+﻿
+
+﻿
+
+Example of Login page
+Example of Login page
+
+﻿
