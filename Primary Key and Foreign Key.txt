@@ -1,0 +1,134 @@
+Primary Key & Foreign Key
+﻿http://www.mysqltutorial.org/mysql-primary-key/﻿
+
+You typically define the primary key when you create the table using the CREATE TABLE statement. To create a PRIMARY KEY  constraint for the table, you specify the PRIMARY KEY in the primary key column’s definition.
+
+Copy
+CREATE TABLE users(
+   user_id INT AUTO_INCREMENT PRIMARY KEY,
+   username VARCHAR(40),
+   password VARCHAR(255),
+   email VARCHAR(255)
+);
+﻿
+
+You can also specify the PRIMARY KEY at the end of the CREATE TABLE  statement as follows:
+
+Copy
+CREATE TABLE roles(
+   role_id INT AUTO_INCREMENT,
+   role_name VARCHAR(50),
+   PRIMARY KEY(role_id)
+);
+﻿
+
+In case the primary key consists of multiple columns, you must specify them at the end of the CREATE TABLE  statement. You put a coma-separated list of primary key columns inside parentheses followed the PRIMARY KEY  keywords.
+
+Copy
+CREATE TABLE user_roles(
+   user_id INT NOT NULL,
+   role_id INT NOT NULL,
+   PRIMARY KEY(user_id,role_id),
+   FOREIGN KEY(user_id) REFERENCES users(user_id),
+   FOREIGN KEY(role_id) REFERENCES roles(role_id)
+);
+﻿
+
+Defining MySQL PRIMARY KEY constraints using ALTER TABLE statement
+
+Copy
+CREATE TABLE t1(
+   id INT,
+   title VARCHAR(255) NOT NULL
+);
+﻿
+ALTER TABLE t1 ADD PRIMARY KEY(id);
+﻿
+
+Foreign Key
+A foreign key is a field in a table that matches another field of another table. A foreign key places constraints on data in the related tables, which enables MySQL to maintain referential integrity.
+
+﻿
+
+We have two tables: customers and orders. Each customer has zero or more orders and each order belongs to only one customer. The relationship between customers table and orders table is one-to-many, and it is established by a foreign key in the orders table specified by the customerNumber field. The customerNumber field in the orders table relates to the customerNumber primary key field in the customers table.
+
+﻿
+
+﻿
+
+
+
+The following syntax illustrates how to define a foreign key in a child table in CREATE TABLE statement.
+
+Copy
+CREATE DATABASE IF NOT EXISTS dbdemo;
+﻿
+USE dbdemo;
+﻿
+CREATE TABLE categories(
+   cat_id int not null auto_increment primary key,
+   cat_name varchar(255) not null,
+   cat_description text
+) ENGINE=InnoDB;
+﻿
+CREATE TABLE products(
+   prd_id int not null auto_increment primary key,
+   prd_name varchar(355) not null,
+   prd_price decimal,
+   cat_id int not null,
+   FOREIGN KEY fk_cat(cat_id)
+   REFERENCES categories(cat_id)
+   ON UPDATE CASCADE
+   ON DELETE RESTRICT
+)ENGINE=InnoDB;
+﻿
+
+Adding a foreign key to a table
+Copy
+USE dbdemo;
+﻿
+CREATE TABLE vendors(
+    vdr_id int not null auto_increment primary key,
+    vdr_name varchar(255)
+)ENGINE=InnoDB;
+﻿
+ALTER TABLE products 
+ADD COLUMN vdr_id int not null AFTER cat_id;
+﻿
+ALTER TABLE products
+ADD FOREIGN KEY fk_vendor(vdr_id)
+REFERENCES vendors(vdr_id)
+ON DELETE NO ACTION
+ON UPDATE CASCADE;
+﻿
+
+Drop foreign key
+Find unique constraint:
+
+Copy
+SHOW CREATE TABLE products;
+///
+products | CREATE TABLE `products` (
+  `prd_id` int(11) NOT NULL AUTO_INCREMENT,
+  `prd_name` varchar(355) COLLATE utf8mb4_general_ci NOT NULL,
+  `prd_price` decimal(10,0) DEFAULT NULL,
+  `cat_id` int(11) NOT NULL,
+  `vdr_id` int(11) NOT NULL,
+  PRIMARY KEY (`prd_id`),
+  KEY `fk_cat` (`cat_id`),
+  KEY `fk_vendor` (`vdr_id`),
+  CONSTRAINT `products_ibfk_1` FOREIGN KEY (`cat_id`) REFERENCES `categories` (`cat_id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `products_ibfk_2` FOREIGN KEY (`vdr_id`) REFERENCES `vendors` (`vdr_id`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+﻿
+
+Remove foreign key:
+
+Copy
+ALTER TABLE products DROP FOREIGN KEY products_ibfk_2;
+ALTER TABLE products DROP KEY fk_vendor;
+﻿
+
+Notes:
+
+﻿https://tableplus.com/blog/2018/11/how-to-add-foreign-key-constraint-in-mysql.html

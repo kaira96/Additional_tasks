@@ -1,0 +1,67 @@
+Logger decorator
+Create a decorator that can decorate arbitrary function logging the call and its parameters.
+
+The example of code might look like this:
+
+Copy
+from future import print_function
+﻿
+def myDecorator(func):
+    // Your code
+﻿
+
+Testing:
+
+Copy
+from future import print_function
+from logger_decor import myDecorator
+﻿
+@myDecorator
+def testFunc(a, b=1, args, *kwargs):
+    print("argument a: ", a)
+    print("argument b: ", b)
+    print("argument args: ", args)
+    print("argument kwargs: ", *kwargs)
+﻿
+    return a + b
+﻿
+testFunc(2, 3, 4, 5, c=6, d=7)
+print()
+testFunc(2, c=5, d=6)
+print()
+testFunc(10)
+﻿
+
+Output should be:
+
+Copy
+Calling testFunc((2, 3, 4, 5), {'c': 6, 'd': 7})
+argument a: 2
+argument b: 3
+argument args: 4,5
+argument kwargs: c: 6, d: 7
+Finished testFunc(5)
+﻿
+Calling testFunc((2,), {'c': 5, 'd': 6})
+argument a: 2
+argument b: 1
+argument args: ()
+argument kwargs: c: 5, d: 6
+Finished testFunc(3)
+﻿
+Calling testFunc((10,), {})
+argument a: 10
+argument b: 1
+argument args: ()
+argument kwargs: {}
+﻿
+Finished f(11)
+﻿
+
+﻿
+
+Useful links: 
+
+﻿https://stackoverflow.com/questions/308999/what-does-functools-wraps-do﻿
+﻿https://pythontips.com/2013/08/04/args-and-kwargs-in-python-explained/﻿
+﻿

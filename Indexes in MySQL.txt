@@ -1,0 +1,131 @@
+Indexes in MySQL
+A database index is a data structure that improves the speed of operations in a table. 
+
+﻿
+
+While creating index, it should be taken into consideration which all columns will be used to make SQL queries and create one or more indexes on those columns.
+
+﻿
+
+Practically, indexes are also a type of tables, which keep primary key or index field and a pointer to each record into the actual table.
+
+﻿
+
+The INSERT and UPDATE statements take more time on tables having indexes, whereas the SELECT statements become fast on those tables. The reason is that while doing insert or update, a database needs to insert or update the index values as well.
+
+﻿
+
+The phone book analogy
+Suppose you have a phone book that contains all the names and phone numbers of people in a city. Let’s say you want to find Bob Cat’s phone number. Knowing that the names are alphabetically ordered, you first look for the page where the last name is Cat, then you look for Bob and his phone number.
+
+﻿
+
+Now, if the names in the phone book were not sorted alphabetically, you would need to go through all pages, reading every name in it until you find Bob Cat. This is called sequential searching. You go over all the entries until you find the person with the phone number that you are looking for.
+
+﻿
+
+Relating the phone book to the database table, if you have a phonebook table and you have to find the phone number of Bob Cat, you would perform the following query:
+
+Copy
+SELECT
+    phone_number
+FROM 
+    phone_book
+WHERE 
+    first_name = 'Bob' AND 
+    last_name = 'Cat';
+﻿
+
+Introduction to index
+An index is a data structure such as B-Tree that improves the speed of data retrieval on a table at the cost of additional writes and storage to maintain it.
+
+﻿
+
+The query optimizer may use indexes to quickly locate data without having to scan every row in a table for a given query.
+
+﻿
+
+When you create a table with a primary key or unique key, MySQL automatically creates a special index named PRIMARY. This index is called the clustered index.
+
+﻿
+
+The PRIMARY index is special because the index itself is stored together with the data in the same table. The clustered index enforces the order of rows in the table.
+
+﻿
+
+Other indexes other than the PRIMARY index are called secondary indexes or non-clustered indexes.
+
+﻿
+
+MySQL CREATE INDEX statement
+Copy
+CREATE INDEX index_name ON table_name (column_list)
+﻿
+
+By default, MySQL creates the B-Tree index if you don’t specify the index type. 
+
+﻿
+
+Example
+The following statement finds employees whose job title is Sales Rep:
+
+Copy
+SELECT 
+    employeeNumber, 
+    lastName, 
+    firstName
+FROM
+    employees
+WHERE
+    jobTitle = 'Sales Rep';
+To see how MySQL internally performed this query, you add the EXPLAIN clause at the beginning of the SELECT statement as follows:
+
+Copy
+EXPLAIN SELECT 
+    employeeNumber, 
+    lastName, 
+    firstName
+FROM
+    employees
+WHERE
+    jobTitle = 'Sales Rep';
+﻿
+
+As you can see, MySQL had to scan the WHOLE table to find the employees with the Sales Rep job title.
+
+﻿
+
+Now, let’s create an index for the  jobTitle column by using the CREATE INDEX statement:
+
+Copy
+CREATE INDEX jobTitle ON employees(jobTitle);
+﻿
+
+And execute the above statement again:
+
+Copy
+EXPLAIN SELECT 
+    employeeNumber, 
+    lastName, 
+    firstName
+FROM
+    employees
+WHERE
+    jobTitle = 'Sales Rep';
+As you can see, MySQL just had to locate only rows from the  jobTitle index as indicated in the key column without scanning the whole table.
+
+﻿
+
+To show the indexes of a table, you use the SHOW INDEXES statement, for example:
+
+Copy
+SHOW INDEXES FROM employees;
+﻿
+
+Summary
+Indexes are very powerful when it comes to greatly improving the performance of MySQL search queries.
+Indexes can be defined when creating a table or added later on after the table has already been created.
+You can define indexes on more than one column on a table.
+The SHOW INDEX FROM table_name is used to display the defined indexes on a table.
+The DROP command is used to remove a defined index on a given table.
+﻿

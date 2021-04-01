@@ -1,0 +1,81 @@
+Django app
+Installation
+To install Django Simply run the following code in your terminal or cmd.
+
+Copy
+pip install django
+﻿
+
+Then in Python console check the version:
+
+Copy
+>>> import django
+>>> print(django.get_version())
+2.1
+﻿
+
+Creating A Project
+Copy
+$ django-admin startproject mysite
+﻿
+
+This will create a mysite  directory in the current directory.Let's what the first_site directory contains.
+
+Copy
+mysite/
+    manage.py
+    mysite/
+        init.py
+        settings.py
+        urls.py
+        wsgi.py
+﻿
+
+manage.py: A command line utility to interact with the Django in various ways. You can read all the details about manage.py at django-manage[https://docs.djangoproject.com/en/2.1/ref/django-admin/].
+The inner mysite  directory is the actual Python package container for your project.
+mysite/___init\_.py : It's an empty file that tells Python that this directory should be considered as a Python package. If you want to read more about Python packages, go to Python Packages Official Docs [https://docs.python.org/3/tutorial/modules.html#tut-packages].
+mysite/settings.py: It helps to configure the Django. You can learn more about at django settings [https://docs.djangoproject.com/en/2.1/topics/settings/].
+mysite/urls.py: This is the Django declaration for your project. You can read all the documentation at django urls [https://docs.djangoproject.com/en/2.1/topics/http/urls/].
+mysite/wsgi.py: It helps while you're uploading your website to the servers. See How to Serve With WSGI for more information [https://docs.djangoproject.com/en/2.1/howto/deployment/wsgi/].
+﻿
+
+Django Server
+Copy
+$ python manage.py runserver
+You started the Django server. Django server was written in Python. Let's check it by visiting the url http://127.0.0.1:8000/ or http://localhost:8000/ in your browser.
+
+﻿
+
+To change the port of the server just add port number at the end of the command.
+
+Copy
+$ python manage.py runserver 8111
+Now, it will serve port at 8111. You don't need to restart the Django server when you make changes in your project. It will automatically load all the changes you make in the project.
+
+﻿
+
+Creating The App
+Now, your project is ready to develop apps. All the websites contain some apps like user login system, news feed, etc.., based on the type of website.
+
+﻿
+
+You can simply create apps in Django project. Django automatically generates the basic structure for your apps.
+
+To create your app, make sure that you are in the same directory as manage.py  . Inside your project.
+
+Copy
+$ python manage.py startapp myapp
+﻿
+
+That'll create an app called myapp in the outer first_site directory. The structure of the file is...
+
+Copy
+myapp/
+    init.py
+    admin.py
+    apps.py
+    migrations/
+        init.py
+    models.py
+    tests.py
+    views.py

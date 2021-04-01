@@ -1,0 +1,288 @@
+ORM
+Введение в ORM
+
+ORM – это акроним от Object Relational Mapping (Объектно-реляционное отображение). Но что именно оно делает?
+
+﻿
+
+Из википедии:
+
+﻿
+
+Объектно-реляционное отображение — это технология программирования, которая связывает базы данных с концепциями объектно-ориентированных языков программирования, создавая «виртуальную объектную базу данных». Существуют как проприетарные, так и свободные реализации этой технологии.
+
+Звучит круто, да?
+
+﻿
+
+Что такое Peewee?
+
+Peewee (http://docs.peewee-orm.com/en/latest/) – это небольшое ORM, которое в данный момент поддерживает postgresql, mysql и sqlite. Разумеется, это не единственное ORM для разработчиков Python. К примеру, Django предоставляет собственную ORM библиотеку, кроме этого, всегда есть SqlAlchemy. Хорошая сторона Peewee – это то, что он занимает мало места, его легко освоить, и вы можете приступить к работе с приложениями за несколько минут.
+
+﻿
+
+Достаточно слов, перейдем к кодам!
+
+﻿
+
+Установка Peewee
+
+Как и многие другие библиотеки Python, вы можете установить Peewee при помощи pip:
+
+﻿
+
+Copy
+pip install peewee
+﻿
+
+Настройка базы данных
+
+Как я говорил, Peewee поддерживает ряд движков для работы с базами данных (полный список тут: http://docs.peewee-orm.com/en/latest/peewee/database.html), в данной статье я использую MySQL.
+
+Создадим файл main.py и закинем код ниже , после попробуем запустить .
+
+Copy
+import datetime
+from peewee import *
+﻿
+user = 'your_name'
+password = 'your_password'
+db_name = 'peewee_demo'
+﻿
+dbhandle = MySQLDatabase(
+    db_name, user=user,
+    password=password,
+    host='localhost'
+)
+﻿
+dbhandle.connect()
+﻿
+
+Объект MySQLDatabase создан.
+
+﻿
+
+Создание моделей в Peewee
+
+Сейчас я перейду к созданию моделей. В этом уроке я использую две таблицы или модели: «Категория» и «Продукт«. Категория может содержать несколько продуктов. 
+
+Теперь в main.py закинем нижеследующий код 
+
+﻿
+
+﻿
+
+Copy
+class BaseModel(Model):
+    class Meta:
+        database = dbhandle
+﻿
+﻿
+class Category(BaseModel):
+    id = PrimaryKeyField(null=False)
+    name = CharField(max_length=100)
+﻿
+    created_at = DateTimeField(default=datetime.datetime.now)
+    updated_at = DateTimeField(default=datetime.datetime.now)
+﻿
+    class Meta:
+        db_table = "categories"
+        order_by = ('created_at',)
+﻿
+
+Сначала я создал BaseModel. Это связанно с тем, что Peewee просит вас передать dbhandle в каждый класс Model. Чтобы избежать лишних движений, я просто создал базовый класс и расширил его. Ознакомиться со всеми типами столбцов в таблице можно тут: http://docs.peewee-orm.com/en/latest/peewee/models.html#field-types-table
+
+﻿
+
+Хорошо, наша BaseModel и Category созданы. Модель Category состоит из четырех полей:
+
+id, который является полем автоматического прироста;
+
+name содержит имя категории;
+
+updated_at и created_at – поля timestamp, которые определяют настоящее время по умолчанию.
+
+В классе Meta я передаю название таблицы в собственность db_table. Это не обязательно, если название таблицы и модели одинаковые. Собственность order_by указывает, какой столбец должен использоваться для сортировки данных во время извлечения. Вы можете переписать его, передав вид по полю на ваше усмотрение.
+
+﻿
+
+Дальше тем же путем изменим нашу main.py и запишем туда код :
+
+Copy
+if __name__ == '__main__':
+    try:
+        Category.create_table()
+    except InternalError as px:
+        print(str(px))
+﻿
+
+После импорта, я подключаюсь к базе данных. Ошибка OperationalError ссылается на все ошибки, связанные с Peewee. К примеру, если вы введете неправильные учетные данные, вы получите следующее:
+
+Copy
+(1045, "Access denied for user 'root1'@'localhost' (using password: YES)")
+﻿
+
+Затем мы вызываем Category.create_table(), которые создает таблицу с указанной ранее собственностью. Если вы передаете safe=True в качестве параметра, то существующая таблица просто перепишется. Это может привести к проблемам в реальной ситуации.
+
+﻿
+
+Далее, модель Product:
+
+Copy
+class Product(BaseModel):
+    id = PrimaryKeyField(null=False)
+    name = CharField(max_length=100)
+    price = FloatField(default=None)
+    category = ForeignKeyField(Category, related_name='fk_cat_prod', to_field='id', on_delete='cascade',
+                               on_update='cascade')
+    created_at = DateTimeField(default=datetime.datetime.now)
+    updated_at = DateTimeField(default=datetime.datetime.now)
+﻿
+    class Meta:
+        db_table = "products"
+        order_by = ('created_at',)
+﻿
+﻿
+if __name__ == '__main__':
+    try:
+        Product.create_table()
+    except InternalError as px:
+        print(str(px))
+Она аналогична модели Category. Разница только в ForeignKeyField, который указывает, как именно Product должен быть связан с Category. 
+
+После запуска указанного выше кода, создается таблица модели product, а также отношение с таблицей categories.
+
+﻿
+
+Вставка записи (INSERT)
+Теперь мы можем перейти к добавлению данных сперва в category, а затем в таблицу products. Так как у нас есть рабочие модели, не так просто добавлять или обновлять записи.
+
+﻿
+
+Copy
+def add_category(name):
+    row = Category(
+        name=name.lower().strip(),
+    )
+    row.save()
+﻿
+add_category('Books')
+add_category('Electronic Appliances')
+﻿
+
+﻿
+
+Я добавил функцию под названием add_category() с параметром и именем внутри. Объект Category создан, как и поля таблицы, которые являются переданной собственностью данного объекта класса. В нашем случае, это поле name.
+
+﻿
+
+The row.save() сохраняет данные из объекта в базу данных.
+
+﻿
+
+Круто, не так ли? Больше не нужно прописывать уродливые INSERT-ы.
+
+﻿
+
+Теперь добавим product.
+
+Copy
+def add_product(name, price, category_name):
+    cat_exist = True
+    try:
+        category = Category.select().where(Category.name == category_name.strip()).get()
+    except DoesNotExist as de:
+        cat_exist = False
+﻿
+    if cat_exist:
+        row = Product(
+            name=name.lower().strip(),
+            price=price,
+            category=category
+        )
+        row.save()
+﻿
+# Добавление продуктов.
+add_product('C++ Premier', 24.5, 'books')
+add_product('Juicer', 224.25, 'Electronic Appliances')
+﻿
+
+Я передаю имя категории, как только её объект будет найден и передан объекту класса Product. Если вы хотите пойти по пути SQL, для начала вам нужно выполнить SELECT, чтобы получить существующий category_id, и затем назначить id добавляемому продукту.
+
+﻿
+
+Так как работать с ORM – значит иметь дело с объектами, мы храним объекты вместо скалярных значений. Кто-то может посчитать это слишком «инженерным» методом в нашем случае, но подумайте о случаях, когда вы понятия не имеете о том, какая база данных должна быть использована в будущем. Ваш код – это универсальный инструмент для работы с базами данных, так что если он работает с MySQL, или MSSQL, то он будет работать даже с MongoDb (гипотетически).
+
+﻿
+
+Выбор нескольких записей
+Сначала выделяем категории:
+
+Copy
+def find_all_categories():
+    return Category.select()
+﻿
+def find_all_products():
+    return Product.select()
+﻿
+
+Category.select() возвращает ВСЮ запись, которая будет отсортирована по столбцу created_at, что мы и указали в классе Meta.
+
+﻿
+
+Теперь выбираем все продукты:
+
+Copy
+products = find_all_products()
+product_data = []
+for product in products:
+    product_data.append({
+        'title': product.name,
+        'price': product.price,
+        'category': product.category.name
+    })
+﻿
+print(product_data)
+﻿
+
+Здесь я перебираю продукты и добавляю запись в список product_data. Обратите внимание на доступ к категории продукта. Больше нет SELECT для получения ID, с последующим поиском названия. Простой цикл делает все за нас. При запуске, информация о продукте будет отображаться следующим образом:
+
+Copy
+[{'title': 'c++ premier', 'price': 24.5, 'category': 'books'}, {'title': 'juicer', 'price': 224.25, 'category': 'electronic appliances'}, {'title': 'c++ premier', 'price': 24.5, 'category': 'books'}, {'title': 'juicer', 'price': 224.25, 'category': 'electronic appliances'}]
+﻿
+
+﻿
+
+Выбор одной записи
+Чтобы выбрать одну запись, вам нужно использовать метод get:
+
+Copy
+def find_product(name):
+    return Product.get(Product.name == name.lower().strip())
+﻿
+p = find_product('c++ premier')
+print(p.category.name)
+Название товара передано функции find_product, если запись существует – она вернет экземпляр Product. Здесь я вывожу категорию, связанную с этим продуктом.
+
+Обновление записей в Peewee
+Обновление записей – это так же просто, как и их создание. Вы получаете экземпляр объекта, после чего обновляете его.
+
+﻿
+
+Copy
+def update_category(id, new_name):
+    category = Category.get(Category.id == id)
+    category.name = new_name
+    category.save()
+update_category(2, 'Kindle Books')
+Удаление записей в Peewee
+Удаление записи не сильно отличается от обновления:
+
+Copy
+def delete_category(name):
+    category = Category.get(Category.name == name.lower().strip())
+    category.delete_instance()
+delete_category('Kindle Books')
+﻿
+
+Обратите внимание на то, что после удаления записи, вы также удаляете связанные продукты, так как они подключены к категории, и мы уже определили сценарий во время удаления раздела ON_DELETE, будут удаляться и товары из раздела.

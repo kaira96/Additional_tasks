@@ -1,0 +1,13 @@
+Getting started with MySQL in Python
+You have to install mysql.connector for Python. We need mysql.connector to connect Python Script to the MySQL database. Download the mysql.connector from here and install it on your computer.
+
+Python3 - https://github.com/PyMySQL/PyMySQL﻿
+﻿
+
+Now, check whether you have installed the mysql.connector correctly or not using the following code.
+
+﻿
+
+Copy
+import pymysql
+﻿

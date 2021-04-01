@@ -1,0 +1,137 @@
+Web development with Django
+What is Django?
+Django is a high-level Python Web framework. It helps to create websites with ease. Django takes care of most of the irritating parts in Web Development. It is free and open source Web framework with an excellent documentation.
+
+﻿
+
+Django Web application
+URLs - A URL mapper is used to redirect the HTTP requests to appropriate view based on the request URL. It also matches the particular patterns of strings or digits that appear in the URL and passes these to the view functions as a data.
+﻿
+
+View - A View is a request handler function, which receives HTTP requests and returns the HTTP responses. Views access the data needed to satisfy requests via models and formatting the responses to templates.
+﻿
+
+Model - Models are the Python objects that define the structures of application's data. It provides to manage (Create, Update, Read, Delete) application's data into the database.
+﻿
+
+Templates - A Template is a text file defining the layout of a file. A view can dynamically create an HTML page using an HTML template, populating it with data from a model. A template can be used to define the structure of any type of file; it doesn't have to be HTML.
+﻿
+
+﻿
+
+Sending the request to the right view (urls.py)
+A URL mapper in the Django project is urls.py. In the below example, the mapper called as urlpatterns defines different types of url patterns and corresponding view function. If an HTTP request is received that has a URL matching in the urlpatterns invokes the corresponding view function and passes that request.
+
+Copy
+from django.contrib import admin
+from django.urls import urls, include
+﻿
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('question<int:id>/', views.question_detail, name = 'question_detail'),
+    path('questions', include('questions.urls')),
+]
+﻿
+
+The urlpatterns object is a Python list with items path().
+
+﻿
+
+The first argument that the path() takes is the pattern(Route) that will be matched.
+
+﻿
+
+path() methods use angle brackets (<>) to capture the data from the URL and passes to the view function as a named argument(s). For example, if you have 10 question and the url looks like this 'questions/1', then the <> takes the id, i.e., 1 from the URL to display corresponding content in the pages. You will see this in detail in coming Voting App Tutorial With Django.
+
+﻿
+
+The second argument is another function that invokes corresponding functions when the URL is matched. The notation views.question_detail indicates that the function is called question_detail(). This can be found in the views module (views.py).
+
+﻿
+
+A third argument name is an option which can be used to shorten the URL. You will learn about it later in this article.
+
+﻿
+
+urls are usually stored in a file called urls.py
+
+﻿
+
+Handling the requests (views.py)
+Views are the heart of the Django applications. They are responsible for the HTTP requests and HTTP responses. In between they perform some activities like database operations, rendering HTML templates, etc.,
+
+The example below shows a minimal view function index(). It receives the HttpRequest as a parameter request and returns the HttpResponse object. In this example we don't do anything with a request, we simply return a string.
+
+Copy
+# filename: views.py
+from django.http import HttpResponse
+﻿
+def index(request):
+    # Get a HttpRequest - request
+    # perfoms operations according to the request
+    # Returning a HttpResponse
+    return HttpResponse("Simple Django HttpReponse")
+﻿
+
+﻿
+
+Creating data models {models.py}
+Copy
+from django.db import models
+﻿
+class Question(models.Model):
+    question_text = ChatField(max_length = 200)
+﻿
+
+﻿
+
+Querying Data {Views.py}
+Django provides a simple Data query API for the database.
+
+The code is shown below, how to select all the questions from the Question model.
+
+Copy
+# filename: views.py
+﻿
+from django.shortcuts import render
+from .models import Question
+﻿
+def index(request):
+    all_questions = Question.objects.all();
+    return render(request, 'templates/index.html', {'all_questions' : all_questions})
+﻿
+
+The function render()  is the shortcut method to create a HttpResponse that is sent back to the browser. It creates an HTML file by combining the corresponding template and data we inserted, i.e., the variable 'all_questions'. It inserts the data that we provided in the HTML file. You can learn more in the later tutorial.
+
+﻿
+
+Rendering Data {HTML Templates}
+Templates allow you to specify the structure of the output document. Templates are often used to create HTML documents. You can also create other types of documents also if needed like CSS, JS, XML, JSON, etc.., Django has its own template system. If you want you can also use the popular Python library called Jinja2 for template system.
+
+﻿
+
+The code shown below is the HTML template file. It is called by the function render().
+
+﻿
+
+You have to write the python code in between {% %} pounds, so that Django recognizes that it is a Python code. And to display the variable in HTML template, you have to use {{ }}. Write a variable that you have to display in between 2 curly braces. You have to close the for loop and if questions by writing end(here for or if).
+
+Copy
+# filename: index.html
+﻿
+<!DOCTYPE html>
+<html lang='en'>
+﻿
+<head>
+    <title> Index </title>
+</head>
+﻿
+<body>
+    <div id='question'>
+        {% for question in questions %}
+            {{ question }}
+        {% endfor %}
+    </div>
+</body>
+</html>
+﻿

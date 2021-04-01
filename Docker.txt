@@ -1,0 +1,55 @@
+Docker
+What is Docker?
+Docker is an open platform for developing, shipping & running distributed applications, whether on laptops, data center VMs or cloud. Docker provides the ability to package and run an application in a loosely isolated environment called a container. The Docker Platform consists of multiple product/tools, including the Docker Engine, Images, Containers, and Hub, among others.
+
+﻿
+
+﻿
+
+The Docker platform is the only container platform to build, secure and manage the widest array of applications from development to production both on premises and in the cloud.
+
+﻿
+
+Container vs VM
+﻿
+
+
+
+﻿
+
+How it works
+﻿
+
+﻿
+
+
+
+Namespaces
+Docker makes use of kernel namespaces to provide the isolated workspace called the container. When you run a container, Docker creates a set of namespaces for that container. These namespaces provide a layer of isolation. Each aspect of a container runs in a separate namespace and its access is limited to that namespace.
+
+Docker Engine uses the following namespaces on Linux:
+
+PID namespace for process isolation.
+NET namespace for managing network interfaces.
+IPC namespace for managing access to IPC resources.
+MNT namespace for managing filesystem mount points.
+UTS namespace for isolating kernel and version identifiers.
+﻿
+
+Cgroups
+Docker also makes use of kernel control groups for resource allocation and isolation. A cgroup limits an application to a specific set of resources. Control groups allow Docker Engine to share available hardware resources to containers and optionally enforce limits and constraints.
+
+Docker Engine uses the following cgroups:
+
+Memory cgroup for managing accounting, limits and notifications.
+HugeTBL cgroup for accounting usage of huge pages by process group.
+CPU group for managing user / system CPU time and usage.
+CPUSet cgroup for binding a group to specific CPU. Useful for real time applications and NUMA systems with localized memory per CPU.
+BlkIO cgroup for measuring & limiting amount of blckIO by group.
+net_cls and net_prio cgroup for tagging the traffic control.
+Devices cgroup for reading / writing access devices.
+Freezer cgroup for freezing a group. Useful for cluster batch scheduling, process migration and debugging without affecting prtrace.
+﻿
+
+Union File Systems
+Union file systems operate by creating layers, making them very lightweight and fast. Docker Engine uses UnionFS to provide the building blocks for containers. Docker Engine can use multiple UnionFS variants, including AUFS, btrfs, vfs, and devicemapper.

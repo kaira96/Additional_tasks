@@ -1,0 +1,251 @@
+MySQL tutorial
+About MySQL
+﻿
+
+MySQL is an open source database management software that helps users store, organize, and retrieve data. It is a very powerful program with a lot of flexibility—this tutorial will provide the simplest introduction to MySQL
+
+How to Access the MySQL shell
+Once you have MySQL installed on your droplet, you can access the MySQL shell by typing the following command into terminal:
+
+﻿
+
+Copy
+mysql -u root -p
+﻿
+
+After entering the root MySQL password into the prompt (not to be confused with the root droplet password), you will be able to start building your MySQL database.
+
+﻿
+
+Two points to keep in mind:
+
+All MySQL commands end with a semicolon; if the phrase does not end with a semicolon, the command will not execute.
+Also, although it is not required, MySQL commands are usually written in uppercase and databases, tables, usernames, or text are in lowercase to make them easier to distinguish. However, the MySQL command line is not case sensitive.
+﻿
+
+How to Create and Delete a MySQL Database
+MySQL organizes its information into databases; each one can hold tables with specific data.
+
+﻿
+
+You can quickly check what databases are available by typing:
+
+Copy
+SHOW DATABASES;
+﻿
+
+Your screen should look something like this:
+
+Copy
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| test               |
++--------------------+
+4 rows in set (0.01 sec)
+﻿
+
+Creating a database is very easy:
+
+Copy
+CREATE DATABASE courses;
+﻿
+
+in this case, for example, we will call our database "courses."
+
+Copy
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| courses            |
+| mysql              |
+| performance_schema |
+| test               |
++--------------------+
+5 rows in set (0.00 sec)
+﻿
+
+In MySQL, the phrase most often used to delete objects is Drop. You would delete a MySQL database with this command:
+
+Copy
+DROP DATABASE courses;
+﻿
+
+How to Access a MySQL Database
+Once we have a new database, we can begin to fill it with information.
+
+The first step is to create a new table within the larger database.
+
+Let’s open up the database we want to use:
+
+Copy
+USE courses;
+﻿
+
+In the same way that you could check the available databases, you can also see an overview of the tables that the database contains.
+
+Copy
+SHOW tables;
+Since this is a new database, MySQL has nothing to show, and you will get a message that says, “Empty set”
+
+﻿
+
+How to Create a MySQL Table
+Let’s imagine that we are planning a get together of friends. We can use MySQL to track the details of the course.
+
+﻿
+
+Let’s create a new MySQL table:
+
+﻿
+
+Copy
+CREATE TABLE python (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(20),
+job VARCHAR(30),
+confirmed CHAR(1), 
+signup_date DATE);
+﻿
+
+This command accomplishes a number of things:
+
+﻿
+
+It has created a table called python within the directory, courses.
+We have set up 5 columns in the table—id, name, job, confirmed, and signup date.
+The “id” column has a command (INT NOT NULL PRIMARY KEY AUTO_INCREMENT) that automatically numbers each row.
+The “name” column has been limited by the VARCHAR command to be under 20 characters long.
+The “job” column designates the each person's job. The VARCHAR limits text to be under 30 characters.
+The “confirmed” column records whether the person has RSVP’d with one letter, Y or N.
+The “date” column will show when they signed up for the event. MySQL requires that dates be written as yyyy-mm-dd
+﻿
+
+Let’s take a look at how the table appears within the database using the "SHOW TABLES;" command:
+
+﻿
+
+Copy
+ mysql> SHOW TABLES;
+ +------------------+
+| Tables_in_courses|
++------------------+
+| python           |
++------------------+
+1 row in set (0.01 sec)
+﻿
+
+We can remind ourselves about the table’s organization with this command:
+
+﻿
+
+Copy
+DESCRIBE python;
+﻿
+
+Keep in mind throughout that, although the MySQL command line does not pay attention to cases, the table and database names are case sensitive: potluck is not the same as PYTHON or Python.
+
+﻿
+
+Copy
+mysql>DESCRIBE python;
++-------------+-------------+------+-----+---------+----------------+
+| Field       | Type        | Null | Key | Default | Extra          |
++-------------+-------------+------+-----+---------+----------------+
+| id          | int(11)     | NO   | PRI | NULL    | auto_increment |
+| name        | varchar(20) | YES  |     | NULL    |                |
+| job         | varchar(30) | YES  |     | NULL    |                |
+| confirmed   | char(1)     | YES  |     | NULL    |                |
+| signup_date | date        | YES  |     | NULL    |                |
++-------------+-------------+------+-----+---------+----------------+
+5 rows in set (0.01 sec)
+﻿
+
+How to Add Information to a MySQL Table;
+Now it’s time to start filling in the details.
+
+Use this format to insert information into each row:
+
+﻿
+
+Copy
+INSERT INTO python (id,name,job,confirmed,signup_date) VALUES (NULL, "John", "Driver","Y", '2019-04-11');
+﻿
+Query OK, 1 row affected (0.00 sec)
+﻿
+
+﻿
+
+﻿
+
+We can take a look at our table:
+
+Copy
+mysql> SELECT * FROM python;
++----+-------+----------------+-----------+-------------+
+| id | name  | food           | confirmed | signup_date |
++----+-------+----------------+-----------+-------------+
+|  1 | John  | Driver         | Y         | 2019-04-11  |
+|  2 | Sandy | Police         | N         | 2019-04-14  |
+|  3 | Tom   | Chef           | Y         | 2019-04-18  |
+|  4 | Tina  | Firefighter    | Y         | 2019-04-10  |
++----+-------+----------------+-----------+-------------+
+4 rows in set (0.00 sec)
+﻿
+
+How to Update Information in the Table
+Now that we have started our potluck list, we can address any possible changes. For example: Sandy has confirmed that she is attending, so we are going to update that in the table.
+
+Copy
+UPDATE python 
+SET 
+confirmed = 'Y' 
+WHERE python.name ='Sandy';
+﻿
+
+How to Add and Delete a Column
+We can easily add this:
+
+Copy
+ ALTER TABLE python ADD email VARCHAR(40);
+﻿
+
+This command puts the new column called "email" at the end of the table by default, and the VARCHAR command limits it to 40 characters.
+
+However, if you need to place that column in a specific spot in the table, we can add one more phrase to the command.
+
+Copy
+ALTER TABLE python ADD email VARCHAR(40) AFTER name;
+﻿
+
+Just as you can add a column, you can delete one as well:
+
+Copy
+ALTER TABLE python DROP email;
+﻿
+
+How to Delete a Row
+f needed, you can also delete rows from the table with the following command:
+
+Copy
+DELETE from [table name] where [column name]=[field text];
+﻿
+
+Copy
+mysql> DELETE from python  where name='Sandy';
+Query OK, 1 row affected (0.00 sec)
+﻿
+mysql> SELECT * FROM python;
++----+-------+----------------+-----------+-------------+
+| id | name  | food           | confirmed | signup_date |
++----+-------+----------------+-----------+-------------+
+|  1 | John  | Driver         | Y         | 2019-04-11  |
+|  3 | Tom   | Chef           | Y         | 2019-04-18  |
+|  4 | Tina  | Firefighter    | Y         | 2019-04-10  |
++----+-------+----------------+-----------+-------------+
+3 rows in set (0.00 sec)

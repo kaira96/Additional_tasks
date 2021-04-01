@@ -1,0 +1,2 @@
+Serializers, ViewSets, and Routers
+﻿https://wsvincent.com/django-rest-framework-serializers-viewsets-routers/

@@ -1,0 +1,310 @@
+Quick Start
+Создаем рабочую папку
+
+Для удобства, проекты мы ведем в папке projects:
+
+cd ~/projects
+
+mkdir simple_django
+
+cd simple_django
+
+﻿
+
+virtualenv 
+
+Создаем виртуальное окружение для проекта. Есть традиционный подход создания виртуального окружения (вариант №1):
+
+python3 -m venv env
+
+(в некоторых случаях, если предыдущая команда не срабатывает, нужно попробовать команду virtualenv env или virtualenv env -p python3 если по умолчанию не создается виртуальное окружение с Python 3)
+
+При этом, для активации мы применяем команду
+
+source env/bin/activate
+
+Устанавливаем Django
+
+В терминале, после активации виртуального окружения набираем следующую команду:
+
+pip install django
+
+﻿
+
+Создание проекта в Django
+
+Подразумевается, что виртуальное окружение активировано. Открываем терминал и набираем команду (точку в конце не забудьте):
+
+django-admin startproject mysite .
+
+Важно: Если случайно создали mysite без точки, то нужно удалить папку mysite и запустить команду заново С ТОЧКОЙ В КОНЦЕ:
+
+django-admin startproject mysite .
+
+Здесь точка означает что проект нужно разворачивать в текущей папке, то есть нет необходимости создавать еще одну папку внутри текущей папки.
+
+А слово mysite -- это название проекта. Можно назвать по-другому.
+
+После набора вышеуказанной команды, мы получили следующую структуру:
+
+﻿
+
+├── manage.py
+
+└── mysite
+
+Copy
+├── __init__.py
+├── settings.py
+├── urls.py
+└── wsgi.py
+manage.py -- служебный скрипт, помогающий управлять нашим django-проектом
+
+В папке mysite содержится файл settings.py в котором содержатся настройки проекта, urls.py -- корневой URLConf -- главный “маршрутизатор” проекта. С помощью него происходит определение того, какая функция будет заниматься отображением информации при переходе на ту или иную страницу.
+
+﻿
+
+Вносим изменения в настройки проекта
+
+Отикрываем файл settings.py, находим переменную TIME_ZONE и меняем значение на следующее:
+
+TIME_ZONE = 'Asia/Bishkek'
+
+Таким образом мы выставили временную зону. Теперь в нашем проекте время будет отображаться правильно.
+
+Также находим следующие переменные, присваиваем следующие значения:
+
+STATIC_URL = '/static/'
+
+Сразу после него добавляем строчку:
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+Это необходимо для того, чтобы была создана папка для хранения статичных файлов -- файлов CSS, JavaScript и т.п.
+
+Также прописываем следующее (эта настройка используется для обеспечения безопасности):
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+Прописываем настройки базы данных. Пока будем обходиться sqlite:
+
+DATABASES = {
+
+Copy
+'default': {
+    'ENGINE': 'django.db.backends.sqlite3',
+    'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+}
+
+﻿
+
+Создание базы данных
+
+Открываем терминал, где активировано наше виртуальное окружение, набираем команду:
+
+python manage.py migrate
+
+Теперь у нас появился файл базы данных db.sqlite3
+
+﻿
+
+Пробный запуск проекта
+
+Убеждаемся, что виртуальное окружение активировано и что мы находимся в папке проекта.
+
+В терминале набираем команду:
+
+python manage.py runserver
+
+В браузере открываем http://localhost:8000
+
+Вы должны увидеть следующее:
+
+﻿
+
+﻿
+
+Создание приложения
+
+В Django принято создавать отдельные приложения в одном проекте. Например, в проекте для мастеров по ремонту бытовой техники может быть два приложения: в первом работа идет с мастерами, в другом -- с клиентами.
+
+В нашем случае пока будет одно приложение под названием blog. Внутри того же проекта набираем следующую команду:
+
+python manage.py startapp blog
+
+Теперь в нашем проекте появилась еще одна папка и содержимое выглядит так:
+
+blog  db.sqlite3  manage.py  mysite
+
+Для того, чтобы наш проект подключил новое приложение, нам необходимо внести дополнения в настройки. Для этого открываем файл mysite/settings.py, дополняем INSTALLED_APPS (дописываем только то, что написано красным):
+
+INSTALLED_APPS = [
+
+Copy
+'django.contrib.admin',
+'django.contrib.auth',
+'django.contrib.contenttypes',
+'django.contrib.sessions',
+'django.contrib.messages',
+'django.contrib.staticfiles',
+'blog',
+]
+
+﻿
+
+Создадим view
+
+В файле views.py (который по умолчанию пустой) мы пишем код, который будет определять что и как будет передаваться пользователю, запросившему страницу.
+
+В целях тестирования, мы создадим примитивную функцию, которая будет возвращать текст ‘hello world’.
+
+Функцию создадим в файле blog/views.py. Так выглядит содержимое файла:
+
+from django.shortcuts import render
+
+from django.http import HttpResponse
+
+def index(request):
+
+Copy
+return HttpResponse('hello world')
+Все view-функции должны принимать в качестве аргумента объект request и возвращать экземпляр класса HttpResponse, что мы и сделали, инициализировав объект, передав текст hello world. Пока результат наших изменения мы еще не увидем.
+
+﻿
+
+Настройка главного маршрутизатора
+
+Наша функция готова. Теперь нам нужно дать знать проекту о том, чтобы мы видели текст ‘hello world’ при переходе на страницу http://localhost:8000
+
+Для этого, нам нужно внести изменения в mysite/urls.py -- главный “маршрутизатор” проекта. В нем мы сообщаем какие приложения задействованы в нем.
+
+├── blog
+
+│   ├── admin.py
+
+│   ├── apps.py
+
+│   ├── init.py
+
+│   ├── migrations
+
+│   │   └── init.py
+
+│   ├── models.py
+
+│   ├── tests.py
+
+│   └── views.py
+
+├── db.sqlite3
+
+├── manage.py
+
+└── mysite
+
+Copy
+├── __init__.py
+├── settings.py
+├── urls.py
+└── wsgi.py
+То есть, в данном файле мы должны указать, что будет еще один urls.py файл, который будет в приложении blog. В нем также будет происходить маршрутизация. Для этого, мы импортируем функцию include, и вызовем его передав ему аргумент ‘blog.urls’. Все это будет происходить внутри функции path(). Кстати, первый аргумент path -- пустое строковое значение:
+
+from django.contrib import admin
+
+from django.urls import path
+
+from django.conf.urls import include
+
+﻿
+
+urlpatterns = [
+
+Copy
+path('admin/', admin.site.urls),
+path('', include('blog.urls')),
+]
+
+Таким образом мы зарегистрировали urls.py приложения blog. Теперь надо его создать (см. далее).
+
+﻿
+
+Создание маршрутизатора приложения
+
+В папке blog мы создадим файл urls.py, импортируем модуль views, и создадим список url-паттернов. Ниже мы передали ранее созданную функцию index() в качестве второго аргумента path():
+
+from django.urls import path
+
+from . import views
+
+﻿
+
+urlpatterns = [
+
+Copy
+path('', views.index, name='index'),
+]
+
+﻿
+
+Теперь запустим проект
+
+python manage.py runserver
+
+Открываем браузер и видим в действии результат работы нашей простейшей view-функции:
+
+﻿
+
+Работа с шаблонами
+
+Для того, чтобы наши страницы были красивыми мы будем применять шаблоны. Они будут храниться в папке templates. То есть, в папке blog создаем папку templates, внутри templates создаем blog, внутри нее создаем файл index.html
+
+├── blog
+
+│   ├── templates
+
+│   │   ├── blog
+
+│   │   │     └── index.html
+
+﻿
+
+Запишем в этот файл следующую разметку:
+
+<html>
+
+Copy
+<head>
+    <title>Django Girls blog</title>
+</head>
+<body>
+    <div>
+        <h1><a href="/">Django Girls Blog</a></h1>
+    </div>
+﻿
+    <div>
+        <p>published: 14.06.2014, 12:14</p>
+        <h2><a href="">My first post</a></h2>
+        <p>Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+    </div>
+﻿
+    <div>
+        <p>published: 14.06.2014, 12:14</p>
+        <h2><a href="">My second post</a></h2>
+        <p>Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut f.</p>
+    </div>
+</body>
+</html>
+
+﻿
+
+Теперь нам нужно указать нашей view-функции, что мы хотим рендерить (показывать) html-шаблон. Для этого мы откроем blog/views.py, перепишем функцию index():
+
+def index(request):
+
+Copy
+return render(request, 'blog/index.html', {})
+﻿
+
+﻿
+
+Дальше попробуйте обновить браузер и вы увидите результат
